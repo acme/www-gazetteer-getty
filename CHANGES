@@ -1,6 +1,6 @@
 Revision history for Perl module WWW::Gazetteer::Getty: 
 
-0.11
+0.11 Tue Jun 23 20:44:33 BST 2009
    - perltidy
    - use new URLs and HTML
    - add computer-readable license

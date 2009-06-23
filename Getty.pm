@@ -7,7 +7,7 @@ use LWP::UserAgent;
 use URI::QueryParam;
 
 use vars qw($VERSION);
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 my $countries = {
     af => 'Afghanistan',
