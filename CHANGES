@@ -6,6 +6,7 @@ Revision history for Perl module WWW::Gazetteer::Getty:
    - add computer-readable license
    - add human-readable license
    - move test into t/ directory
+   - use warnings
 
 0.10 Fri Oct 25 17:22:19 BST 2002
 	- first released version
