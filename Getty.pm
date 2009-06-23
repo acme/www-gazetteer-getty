@@ -471,10 +471,12 @@ module for navigation.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2002, Leon Brocard
+Copyright (C) 2002-9, Leon Brocard
 
-This module is free software; you can redistribute it or modify it
-under the same terms as Perl itself.
+=head1 LICENSE
+
+This module is free software; you can redistribute it or
+modify it under the same terms as Perl itself.
 
 =head1 AUTHOR
 

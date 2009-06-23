@@ -13,9 +13,9 @@ SYNOPSYS
 DESCRIPTION
     A gazetteer is a geographical dictionary (as at the back of an atlas).
     The "WWW::Gazetteer::Getty" module uses the information at
-    http://www.getty.edu/research/tools/vocabulary/tgn/ to return
-    geographical location (longitude, latitude) for towns and cities in
-    countries in the world.
+    http://www.getty.edu/research/conducting_research/vocabularies/tgn/ to
+    return geographical location (longitude, latitude) for towns and cities
+    in countries in the world.
 
     This module is a subclass of "WWW::Gazetteer", so you must use that to
     create a "WWW::Gazetteer::Getty" object. Once you have imported the
@@ -110,8 +110,9 @@ METHODS
     module for navigation.
 
 COPYRIGHT
-    Copyright (C) 2002, Leon Brocard
+    Copyright (C) 2002-9, Leon Brocard
 
+LICENSE
     This module is free software; you can redistribute it or modify it under
     the same terms as Perl itself.
 
