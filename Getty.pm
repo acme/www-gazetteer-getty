@@ -3,6 +3,7 @@ use strict;
 use Carp qw(croak);
 use HTTP::Cookies;
 use LWP::UserAgent;
+use URI::QueryParam;
 
 use vars qw($VERSION);
 $VERSION = '0.10';
@@ -277,15 +278,15 @@ sub find {
 
     my $ua = $self->{ua};
 
-    my $base_url
-        = 'http://vocab.pub.getty.edu/cgi-bin/tgn_browser/tgn.spl?keywords=';
-    my $query_url
-        = 'http://vocab.pub.getty.edu/cgi-bin/tgn_browser/tgn.spl?key=';
+# http://www.getty.edu/vow/TGNServlet?english=Y&find=London&place=&page=1&nation=United+Kingdom
+    my $search_url = URI->new("http://www.getty.edu/vow/TGNServlet");
+    $search_url->query_param( 'english' => 'Y' );
+    $search_url->query_param( 'find'    => $city );
+    $search_url->query_param( 'place'   => undef );
+    $search_url->query_param( 'page'    => 1 );
+    $search_url->query_param( 'nation'  => $country );
 
-    my $request = HTTP::Request->new( 'GET',
-              $base_url 
-            . $city
-            . '&file=%2Ftgn_browser%2Findex.html&searchtype=keyword' );
+    my $request = HTTP::Request->new( 'GET', $search_url );
     my $response = $ua->request($request);
 
     if ( not $response->is_success ) {
@@ -297,22 +298,26 @@ sub find {
     my $content = $response->content;
 
     my @bits = split /checkbox/, $content;
-    shift @bits;    # get rid of first bit
-    shift @bits;    # get rid of second bit
 
     my @ids;
     foreach my $bit (@bits) {
-        next unless $bit =~ m{<b>$city</b>}i;
-        next unless $bit =~ m{$country}i;
-        my ($id) = $bit =~ m{value="(\d+)"};
+        my ($id) = $bit =~ m{subjectid=(\d+)};
+        next unless $id;
         push @ids, $id;
     }
 
     foreach my $id (@ids) {
-        $request = HTTP::Request->new( 'GET',
-                  $query_url 
-                . $id
-                . '&searchtype=record&file=/tgn_browser/index.html' );
+
+# http://www.getty.edu/vow/TGNFullDisplay?find=London&place=&nation=United+Kingdom&prev_page=1&english=Y&subjectid=7018906
+        my $detail_url = URI->new("http://www.getty.edu/vow/TGNFullDisplay");
+        $detail_url->query_param( 'english'   => 'Y' );
+        $detail_url->query_param( 'find'      => $city );
+        $detail_url->query_param( 'place'     => undef );
+        $detail_url->query_param( 'page'      => 1 );
+        $detail_url->query_param( 'nation'    => $country );
+        $detail_url->query_param( 'subjectid' => $id );
+
+        $request = HTTP::Request->new( 'GET', $detail_url );
         $response = $ua->request($request);
 
         if ( not $response->is_success ) {
@@ -321,9 +326,16 @@ sub find {
         }
 
         $content = $response->content;
-        my ( $latitude, $longitude )
+
+# <TD COLSPAN=2 VALIGN=TOP NOWRAP><SPAN CLASS=page>&nbsp;&nbsp;Lat:  51.5000&nbsp;&nbsp;<I>decimal degrees</I></SPAN></TD></TR>
+# <TD COLSPAN=2 VALIGN=TOP NOWRAP><SPAN CLASS=page>&nbsp;&nbsp;Long:   -0.0833&nbsp;&nbsp;<I>decimal degrees</I></SPAN></TD></TR>
+        my ($latitude)
             = $content
-            =~ m{<tr><td>Lat: <b>([0-9.-]+)</b></td> <td>Long: <b>([0-9.-]+)</b></td>};
+            =~ m{Lat:\s+([0-9.-]+)&nbsp;&nbsp;<I>decimal degrees</I>};
+        my ($longitude)
+            = $content
+            =~ m{Long:\s+([0-9.-]+)&nbsp;&nbsp;<I>decimal degrees</I>};
+
         push @cities,
             {
             city      => $city,
@@ -355,9 +367,9 @@ WWW::Gazetteer::Getty - Find location of world towns and cities
 
 A gazetteer is a geographical dictionary (as at the back of an
 atlas). The C<WWW::Gazetteer::Getty> module uses the information at
-http://www.getty.edu/research/tools/vocabulary/tgn/ to return
-geographical location (longitude, latitude) for towns and cities in
-countries in the world.
+http://www.getty.edu/research/conducting_research/vocabularies/tgn/
+to return geographical location (longitude, latitude) for towns and 
+cities in countries in the world.
 
 This module is a subclass of C<WWW::Gazetteer>, so you must use that
 to create a C<WWW::Gazetteer::Getty> object. Once you have imported
